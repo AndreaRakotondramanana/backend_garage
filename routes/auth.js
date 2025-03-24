@@ -7,7 +7,7 @@ const router = express.Router();
 // Inscription
 router.post("/register", async (req, res) => {
   try {
-    const { username, email, password } = req.body;
+    const { username, email, password} = req.body;
 
     // Vérifier si l'utilisateur existe déjà
     let user = await User.findOne({ email });
@@ -16,8 +16,9 @@ router.post("/register", async (req, res) => {
     //   // Hasher le mot de passe
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
+    role = "client";
 
-    user = new User({ username, email, password });
+    user = new User({ username, email, password, role});
     await user.save();
 
     res.status(201).json({ message: "Utilisateur créé" });
