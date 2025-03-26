@@ -6,6 +6,7 @@ const OperationSchema = new mongoose.Schema({
         ref: 'Rdv', // Nom du modèle référencé
         required: true
     },
+    date_heure: { type: Date, required: true },
     statut: { type: String, enum: ['devis', 'reparation', 'historique'], required: true }
 }, { timestamps: true });
 

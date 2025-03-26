@@ -31,6 +31,11 @@ app.use('/operation', require('./routes/operationRoutes'));
 app.use('/prestation', require('./routes/prestationRoutes'));
 app.use('/formule', require('./routes/formuleRoutes'));
 app.use('/detail_operation', require('./routes/detail_operationRoutes'));
+app.use('/mecanicienView', require('./routes/mecanicienViewRoutes'));
+app.use('/prestationView', require('./routes/prestationViewRoutes'));
+app.use('/presence', require('./routes/presenceRoutes'));
+app.use('/presenceView', require('./routes/presenceViewRoutes'));
+app.use('/operationView', require('./routes/operationViewRoutes'));
 
 // Fin Routes Andréa 
 

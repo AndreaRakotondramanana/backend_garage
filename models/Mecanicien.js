@@ -14,7 +14,7 @@ const MecanicienSchema = new mongoose.Schema({
     categorieId: {
         type: mongoose.Schema.Types.ObjectId, // Référence à l'ID de l'utilisateur
         ref: 'Categorie', // Nom du modèle référencé
-        required: true
+        required: true  
     },
     pseudo: { type: String, required: true },
     nom: { type: String, required: true },
