@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const ClientSchema = new mongoose.Schema({
   utilisateurId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User', 
+    ref: 'Utilisateur', 
     required: true
   },
   pseudo: { type: String, required: true },

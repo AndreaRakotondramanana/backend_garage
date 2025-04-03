@@ -1,11 +1,12 @@
 const RendezVous = require('../models/Rendez_vous');
 const DetailRendezVous = require('../models/Detail_rendez_vous');
 const Client = require('../models/Client');
+const Rendez_vous = require('../models/Rendez_vous');
 
 // client prendre rendez_vous
 exports.createRendezVous = async (req, res) => {
     try {
-        const { date_rdv, heure_rdv, clientId, garageId, longitude, latitude, message, prestations } = req.body;
+        const { date_rdv, heure_rdv, clientId, garageId, longitude, latitude, message} = req.body;
 
         // rendez-voous 
         const rendezVous = new RendezVous({
@@ -13,20 +14,19 @@ exports.createRendezVous = async (req, res) => {
             heure_rdv,
             clientId,
             garageId: garageId || null,
-            longitude: garageId ? null : longitude, // si garage choisi, pas besoin de coordonnées
+            longitude: garageId ? null : longitude, 
             latitude: garageId ? null : latitude,
             message: message || ''
         });
         await rendezVous.save();
+        console.log("okkk");
 
         // les prestations choisies
-        for (const prestationId of prestations) {
             const detail = new DetailRendezVous({
                 rendez_vousId: rendezVous._id,
-                prestationId
+                prestationId: "67e24cecb59f73fb6bd95634"
             });
             await detail.save();
-        }
 
         return res.status(201).json({ message: 'Rendez-vous créé avec succès', rendezVousId: rendezVous._id });
     } catch (error) {
@@ -106,6 +106,26 @@ exports.validerRendezVous = async (req, res) => {
         await rendezVous.save();
 
         return res.status(200).json({ message: `Rendez-vous ${rendezVous.status}` });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Erreur serveur' });
+    }
+};
+
+// detail rendez-vous
+exports.detailRendezVousById = async (req, res) => {
+    const { rendezVousId } = req.body;
+
+    try{
+        const rendezvous_detail = await Rendez_vous.findById(rendezVousId)
+            .populate({
+                path: 'detailRendezVous',
+                populate: { path: 'prestationId' }
+            });
+            return res.status(200).json({
+                message: 'Rendez-vous détail',
+                data: rendezvous_detail
+            });
     } catch (error) {
         console.error(error);
         return res.status(500).json({ message: 'Erreur serveur' });

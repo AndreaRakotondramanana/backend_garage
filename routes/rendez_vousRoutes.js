@@ -10,5 +10,7 @@ router.get('/mes-rendez-vous', authClient, rendezVousController.getMesRendezVous
 
 // manager
 router.post('/validation-rendez-vous', authManager, rendezVousController.validerRendezVous);
+router.get('/liste', authManager, rendezVousController.getAllRendezvous);
+router.get('/detail_rendez_vous', authManager, rendezVousController.detailRendezVousById);
 
 module.exports = router;
