@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const Garage = require('../models/Garage'); // Importe le modèle Garage
+const Garage = require('../models/Garage'); 
 
 // Créer un garage
 router.post('/', async (req, res) => {

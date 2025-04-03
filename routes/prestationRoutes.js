@@ -34,7 +34,6 @@ router.get('/:id', async (req, res) => {
     }
 });
 
-// Mettre à jour une prestation
 router.put('/:id', async (req, res) => {
     try {
         const prestation = await Prestation.findByIdAndUpdate(req.params.id, req.body, { new: true });
