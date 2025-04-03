@@ -7,7 +7,7 @@ const VoitureSchema = new mongoose.Schema({
     required: true
   },
   model: { type: String, required: true },
-  marque: { type: String, required: true },
+  marque: { type: String, required: true }, 
   immatriculation: { type: String, required: true },
   annee: { type: Number, required: true },
   type: { type: String, enum: ['Essence', 'Diesel', 'Electrique'], required: true },

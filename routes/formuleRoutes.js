@@ -35,7 +35,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // Mettre à jour une formule
-router.patch('/:id', async (req, res) => {
+router.put('/:id', async (req, res) => {
     try {
         const formule = await Formule.findByIdAndUpdate(req.params.id, req.body, { new: true });
         if (!formule) return res.status(404).send();

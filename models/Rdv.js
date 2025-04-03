@@ -6,14 +6,14 @@ const RdvSchema = new mongoose.Schema({
         ref: 'Garage', // Nom du modèle référencé
         required: true
     },
-    voitureId: {
+    voitureId: { 
         type: mongoose.Schema.Types.ObjectId, // Référence à l'ID de l'utilisateur
         ref: 'Voiture', // Nom du modèle référencé
         required: true
     },
     date_heure: { type: Date, required: true },
     note: { type: String, required: true },
-    statut: { type: String, enum: ['valide', 'non valide'], required: true }
+    statut: { type: String, enum: ['valide', 'non valide', 'fait'], required: true }
 }, { timestamps: true });
 
 module.exports = mongoose.model('Rdv', RdvSchema);

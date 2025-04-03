@@ -36,6 +36,11 @@ app.use('/prestationView', require('./routes/prestationViewRoutes'));
 app.use('/presence', require('./routes/presenceRoutes'));
 app.use('/presenceView', require('./routes/presenceViewRoutes'));
 app.use('/operationView', require('./routes/operationViewRoutes'));
+app.use('/tache', require('./routes/tacheRoutes'));
+app.use('/tacheView', require('./routes/tacheViewRoutes'));
+app.use('/rdvView', require('./routes/rdvViewRoutes'));
+app.use('/detailOperationView', require('./routes/detailOperationViewRoutes'));
+require('./models/Devis_histo');
 
 // Fin Routes Andréa 
 

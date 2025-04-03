@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const MecanicienSchema = new mongoose.Schema({
-    utilisateurId: {
+    utilisateurId: { 
         type: mongoose.Schema.Types.ObjectId, // Référence à l'ID de l'utilisateur
         ref: 'Utilisateur', // Nom du modèle référencé
         required: true

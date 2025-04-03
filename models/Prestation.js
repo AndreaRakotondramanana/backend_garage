@@ -8,7 +8,7 @@ const PrestationSchema = new mongoose.Schema({
     },
     libelle_prestation: { type: String, required: true },
     prix_unitaire_base: { type: Number, required: true },
-    duree: { type: Number, required: true }
-}, { timestamps: true });
+    duree: { type: Number, required: true } 
+}, { timestamps: true }); 
 
-module.exports = mongoose.model('Prestation', PrestationSchema);
+module.exports = mongoose.model('Prestation', PrestationSchema); 

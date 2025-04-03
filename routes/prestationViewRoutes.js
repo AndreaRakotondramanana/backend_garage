@@ -11,6 +11,42 @@ router.get('/', async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
+}); 
+
+// routes/PrestationView.js
+router.get('/prestations-par-categorie', async (req, res) => {
+  try {
+    const prestations = await PrestationView.aggregate([
+      {
+        $group: {
+          _id: {
+            categorieId: "$categorieId",
+            libelle_categorie: "$libelle_categorie"
+          },
+          prestations: {
+            $push: {
+              prestationId: "$prestationId",
+              libelle_prestation: "$libelle_prestation",
+              prix_unitaire_base: "$prix_unitaire_base",
+              duree: "$duree"
+            }
+          }
+        }
+      },
+      {
+        $project: {
+          _id: 0,
+          categorieId: "$_id.categorieId",
+          libelle_categorie: "$_id.libelle_categorie",
+          prestations: 1
+        }
+      }
+    ]);
+    
+    res.json(prestations);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 });
 
 // Lire une prestation par son ID

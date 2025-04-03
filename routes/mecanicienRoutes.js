@@ -35,7 +35,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // Mettre à jour un mécanicien
-router.patch('/:id', async (req, res) => {
+router.put('/:id', async (req, res) => {
     try {
         const mecanicien = await Mecanicien.findByIdAndUpdate(req.params.id, req.body, { new: true });
         if (!mecanicien) return res.status(404).send();

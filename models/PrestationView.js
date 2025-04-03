@@ -9,4 +9,4 @@ const PrestationViewSchema = new mongoose.Schema({
     libelle_categorie: String
 }, { collection: 'prestationView' }); // Spécifiez le nom de la vue ici
 
-module.exports = mongoose.model('PrestationView', PrestationViewSchema);
+module.exports = mongoose.model('PrestationView', PrestationViewSchema); 
