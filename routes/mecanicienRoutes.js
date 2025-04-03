@@ -1,6 +1,10 @@
-const express = require('express');
+
+const express = require("express");
 const router = express.Router();
-const Mecanicien = require('../models/Mecanicien');
+const authManager = require("../middlewares/authManager");
+const mecanicienTravailController = require('../controllers/mecanicienController');
+
+router.post('/assignation', authManager, mecanicienTravailController.assignerTravail);
 
 // Créer un mécanicien
 router.post('/', async (req, res) => {
