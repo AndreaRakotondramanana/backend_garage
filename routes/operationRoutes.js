@@ -3,6 +3,7 @@ const router = express.Router();
 const mongoose = require('mongoose');
 const Operation = require('../models/Operation');
 const Detail_operation = require('../models/Detail_operation');
+const Rdv = require('../models/Rdv'); // Assurez-vous d'importer le modèle Rdv
 
 // Créer une opération
 router.post('/', async (req, res) => {
@@ -17,11 +18,17 @@ router.post('/', async (req, res) => {
 
 // Créer un devis avec ses détails
 router.post('/devis', async (req, res) => {
-    const session = await mongoose.startSession();
-    session.startTransaction();
-    
     try {
         const { rdvId, prestations } = req.body;
+
+        // Validation des données
+        if (!mongoose.Types.ObjectId.isValid(rdvId)) {
+            return res.status(400).json({ message: 'ID de rendez-vous invalide' });
+        }
+
+        if (!prestations || prestations.length === 0) {
+            return res.status(400).json({ message: 'Aucune prestation fournie' });
+        }
 
         // 1. Créer l'opération (devis)
         const operation = new Operation({
@@ -29,33 +36,42 @@ router.post('/devis', async (req, res) => {
             date_heure: new Date(),
             statut: 'devis'
         });
-        await operation.save({ session });
+        const savedOperation = await operation.save();
 
         // 2. Créer les détails d'opération
         const detailsOperations = prestations.map(presta => ({
             prestationId: presta.prestationId,
-            operationId: operation._id,
+            operationId: savedOperation._id,
             quantite: presta.quantite,
             statut: 'En attente'
         }));
 
-        await Detail_operation.insertMany(detailsOperations, { session });
+        await Detail_operation.insertMany(detailsOperations);
 
-        await session.commitTransaction();
+        // 3. Mettre à jour le statut du RDV
+        const updatedRdv = await Rdv.findByIdAndUpdate(
+            rdvId,
+            { statut: 'valide' },
+            { new: true }
+        );
+
+        if (!updatedRdv) {
+            return res.status(404).json({ message: 'Rendez-vous non trouvé' });
+        }
+
         res.status(201).json({
-            message: 'Devis créé avec succès',
-            operation,
-            detailsOperations
+            message: 'Devis créé avec succès et RDV mis à jour',
+            operation: savedOperation,
+            detailsOperations,
+            rdv: updatedRdv
         });
+
     } catch (error) {
-        await session.abortTransaction();
         console.error('Erreur lors de la création du devis:', error);
         res.status(500).json({
             message: 'Erreur lors de la création du devis',
             error: error.message
         });
-    } finally {
-        session.endSession();
     }
 });
 

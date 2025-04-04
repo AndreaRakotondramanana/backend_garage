@@ -25,7 +25,7 @@ router.get('/prestations-par-categorie', async (req, res) => {
           },
           prestations: {
             $push: {
-              prestationId: "$prestationId",
+              prestationId: "$_id",
               libelle_prestation: "$libelle_prestation",
               prix_unitaire_base: "$prix_unitaire_base",
               duree: "$duree"
