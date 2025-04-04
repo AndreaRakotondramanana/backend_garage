@@ -13,9 +13,14 @@ router.get('/', async (req, res) => {
 });
 
 // Lire les operationViews avec statut != historique
-router.get('/cours', async (req, res) => {
+router.get('/cours/:garageId', async (req, res) => {
   try {
-    const operationViews = await OperationView.find({ statut: { $ne: 'historique' } });
+    const garageId = req.params.garageId;
+
+    const operationViews = await OperationView.find({ 
+      statut: { $ne: 'historique' },
+      garageId: garageId
+    });
     res.json(operationViews);
   } catch (error) {
     res.status(500).json({ message: error.message });

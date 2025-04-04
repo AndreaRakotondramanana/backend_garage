@@ -13,11 +13,13 @@ router.get('/', async (req, res) => {
 });
 
 // Lire les rendez-vous de diagnostic non effectués
-router.get('/rdv-faire', async (req, res) => {
-  try {
+router.get('/rdv-faire/:garageId', async (req, res) => {
+  try { 
+    const garageId = req.params.garageId;
     // Recherche des RDV avec statut "non valide"
     const rdvsNonEffectues = await RdvView.find({ 
-      statut: "non valide"  // Pas besoin de $ne ici si vous voulez exactement "non valide"
+      statut: "non valide",
+      garageId: garageId
     });
 
     res.json(rdvsNonEffectues); 
