@@ -13,7 +13,7 @@ const RdvSchema = new mongoose.Schema({
     },
     date_heure: { type: Date, required: true },
     note: { type: String, required: true },
-    statut: { type: String, enum: ['valide', 'non valide', 'fait'], required: true }
+    statut: { type: String, enum: ['valide', 'non valide', 'fait'], required: true, default: 'non valide' }
 }, { timestamps: true });
 
 module.exports = mongoose.model('Rdv', RdvSchema);

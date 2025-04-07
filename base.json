@@ -1,0 +1,574 @@
+// debut vue mecanicienView
+
+db.MecanicienView.drop(); // Supprime la vue existante
+
+db.createView(
+   "MecanicienView", // Nom de la vue
+   "mecaniciens",     // Collection source
+   [
+      {
+         $lookup: {
+            from: "garages",
+            localField: "garageId",
+            foreignField: "_id",
+            as: "garage"
+         }
+      },
+      {
+         $unwind: {
+            path: "$garage",
+            preserveNullAndEmptyArrays: true
+         }
+      },
+      {
+         $lookup: {
+            from: "categories",
+            localField: "categorieId",
+            foreignField: "_id",
+            as: "categorie"
+         }
+      },
+      {
+         $unwind: {
+            path: "$categorie",
+            preserveNullAndEmptyArrays: true
+         }
+      },
+      {
+         $project: {
+            _id: 0,
+            _id: "$_id",
+            pseudo: 1,
+            nom: 1,
+            prenom: 1,
+            mail: 1,
+            date_de_naissance: "$dtn",
+            garageId: "$garage._id",
+            localisation: "$garage.localisation",
+            categorieId: "$categorie._id",
+            libelle_categorie: "$categorie.libelle_categorie"
+         }
+      }
+   ]
+);
+// fin vue mecanicienView
+
+// debut vue prestationView
+
+db.createView(
+   "prestationView", // Nom de la vue
+   "prestations",     // Collection source
+   [
+      {
+         $lookup: {
+            from: "categories",
+            localField: "categorieId",
+            foreignField: "_id",
+            as: "categorie"
+         }
+      },
+      {
+         $unwind: {
+            path: "$categorie",
+            preserveNullAndEmptyArrays: true
+         }
+      },
+      {
+         $project: {
+            _id: 1,
+            libelle_prestation: 1,
+            prix_unitaire_base: 1,
+            duree: 1,
+            categorieId: "$categorie._id",
+            libelle_categorie: "$categorie.libelle_categorie"
+         }
+      }
+   ]
+);
+
+// fin vue prestationView
+
+// debut vue presenceView
+
+db.createView(
+   "presenceView", // Nom de la vue
+   "presences", // Collection source (présences)
+   [
+      // Étape 1 : Filtrer uniquement les présences marquées comme présentes
+      {
+         $match: {
+            present: true // Seulement les présences marquées comme présentes
+         }
+      },
+      // Étape 2 : Joindre la collection "mecaniciens"
+      {
+         $lookup: {
+            from: "mecaniciens", // Collection à joindre
+            localField: "mecanicienId", // Champ dans "presences"
+            foreignField: "_id", // Champ dans "mecaniciens"
+            as: "mecanicien" // Nom du tableau résultant
+         }
+      },
+      // Étape 3 : Déplier le tableau "mecanicien"
+      {
+         $unwind: "$mecanicien"
+      },
+      // Étape 4 : Joindre la collection "garages"
+      {
+         $lookup: {
+            from: "garages", // Collection à joindre
+            localField: "mecanicien.garageId", // Champ dans "mecaniciens"
+            foreignField: "_id", // Champ dans "garages"
+            as: "garage" // Nom du tableau résultant
+         }
+      },
+      // Étape 5 : Déplier le tableau "garage"
+      {
+         $unwind: "$garage"
+      },
+      // Étape 6 : Joindre la collection "categories"
+      {
+         $lookup: {
+            from: "categories", // Collection à joindre
+            localField: "mecanicien.categorieId", // Champ dans "mecaniciens"
+            foreignField: "_id", // Champ dans "categories"
+            as: "categorie" // Nom du tableau résultant
+         }
+      },
+      // Étape 7 : Déplier le tableau "categorie"
+      {
+         $unwind: "$categorie"
+      },
+      // Étape 8 : Projeter les champs nécessaires
+      {
+         $project: {
+            _id: 1, // Inclure l'ID de la présence
+            date: 1, // Inclure la date de la présence
+            mecanicienId: "$mecanicien._id", // ID du mécanicien
+            pseudo: "$mecanicien.pseudo", // Pseudo du mécanicien
+            garageId: "$garage._id", // ID du garage
+            nomGarage: "$garage.localisation", // Nom du garage
+            categorieId: "$categorie._id", // ID de la catégorie
+            libelleCategorie: "$categorie.libelle_categorie" // Libellé de la catégorie
+         }
+      }
+   ]
+);
+
+// fin vue presenceView
+
+// debut vue OperationView
+
+db.createView(
+   "OperationView", // Nom de la vue
+   "operations", // Collection source (operations)
+   [
+      // Étape 1 : Joindre la collection "rdvs"
+      {
+         $lookup: {
+            from: "rdvs", // Collection à joindre
+            localField: "rdvId", // Champ dans "operations"
+            foreignField: "_id", // Champ dans "rdvs"
+            as: "rdv" // Nom du tableau résultant
+         }
+      },
+      // Étape 2 : Déplier le tableau "rdv"
+      {
+         $unwind: "$rdv"
+      },
+      // Étape 3 : Joindre la collection "voitures"
+      {
+         $lookup: {
+            from: "voitures", // Collection à joindre
+            localField: "rdv.voitureId", // Champ dans "rdvs"
+            foreignField: "_id", // Champ dans "voitures"
+            as: "voiture" // Nom du tableau résultant
+         }
+      },
+      // Étape 4 : Déplier le tableau "voiture"
+      {
+         $unwind: "$voiture"
+      },
+      // Étape 5 : Joindre la collection "garages"
+      {
+         $lookup: {
+            from: "garages", // Collection à joindre
+            localField: "rdv.garageId", // Champ dans "rdvs"
+            foreignField: "_id", // Champ dans "garages"
+            as: "garage" // Nom du tableau résultant
+         }
+      },
+      // Étape 6 : Déplier le tableau "garage"
+      {
+         $unwind: "$garage"
+      },
+      // Étape 7 : Joindre la collection "clients"
+      {
+         $lookup: {
+            from: "clients", // Collection à joindre
+            localField: "voiture.clientId", // Champ dans "voitures"
+            foreignField: "_id", // Champ dans "clients"
+            as: "client" // Nom du tableau résultant
+         }
+      },
+      // Étape 8 : Déplier le tableau "client"
+      {
+         $unwind: "$client"
+      },
+      // Étape 9 : Projeter les champs nécessaires
+      {
+         $project: {
+            _id: 1, // ID de l'opération
+            date_heure: 1,
+            statut: 1, // Statut de l'opération
+            voitureId: "$voiture._id", // ID de la voiture
+            model: "$voiture.model", // Modèle de la voiture
+            marque: "$voiture.marque", // Marque de la voiture
+            immatriculation: "$voiture.immatriculation", // Immatriculation de la voiture
+            garageId: "$garage._id", // ID du garage
+            localisation: "$garage.localisation", // Localisation du garage
+            clientId: "$client._id", // ID du client
+            nom: "$client.nom", // Nom du client
+            prenom: "$client.prenom" // Prénom du client
+         }
+      }
+   ]
+);
+
+// fin vue OperationView
+
+// debut vue TotalPresenceView
+
+db.createView(
+   "TotalPresenceView", // Nom de la vue
+   "presences", // Collection source (présences)
+   [
+      // Étape 1 : Filtrer uniquement les présences marquées comme présentes
+      {
+         $match: {
+            present: true // Seulement les présences marquées comme présentes
+         }
+      },
+      // Étape 2 : Joindre la collection "mecaniciens"
+      {
+         $lookup: {
+            from: "mecaniciens", // Collection à joindre
+            localField: "mecanicienId", // Champ dans "presences"
+            foreignField: "_id", // Champ dans "mecaniciens"
+            as: "mecanicien" // Nom du tableau résultant
+         }
+      },
+      // Étape 3 : Déplier le tableau "mecanicien"
+      {
+         $unwind: "$mecanicien"
+      },
+      // Étape 4 : Joindre la collection "garages"
+      {
+         $lookup: {
+            from: "garages", // Collection à joindre
+            localField: "mecanicien.garageId", // Champ dans "mecaniciens"
+            foreignField: "_id", // Champ dans "garages"
+            as: "garage" // Nom du tableau résultant
+         }
+      },
+      // Étape 5 : Déplier le tableau "garage"
+      {
+         $unwind: "$garage"
+      },
+      // Étape 6 : Joindre la collection "categories"
+      {
+         $lookup: {
+            from: "categories", // Collection à joindre
+            localField: "mecanicien.categorieId", // Champ dans "mecaniciens"
+            foreignField: "_id", // Champ dans "categories"
+            as: "categorie" // Nom du tableau résultant
+         }
+      },
+      // Étape 7 : Déplier le tableau "categorie"
+      {
+         $unwind: "$categorie"
+      },
+      // Étape 8 : Projeter les champs nécessaires
+      {
+         $project: {
+            _id: 1, // Inclure l'ID de la présence
+            date: 1, // Inclure la date de la présence
+            mecanicienId: "$mecanicien._id", // ID du mécanicien
+            pseudo: "$mecanicien.pseudo", // Pseudo du mécanicien
+            garageId: "$garage._id", // ID du garage
+            nomGarage: "$garage.localisation", // Nom du garage
+            categorieId: "$categorie._id", // ID de la catégorie
+            libelleCategorie: "$categorie.libelle_categorie" // Libellé de la catégorie
+         }
+      }
+   ]
+);
+
+// fin vue TotalPresenceView
+
+// debut vue TacheView
+
+db.createView(
+   "TacheView", // Nom de la vue
+   "taches", 
+   [
+      {
+         $lookup: {
+            from: "mecaniciens", 
+            localField: "mecanicienId", 
+            foreignField: "_id", 
+            as: "mecanicien" 
+         }
+      },
+      {
+         $unwind: "$mecanicien"
+      },
+      {
+         $lookup: {
+            from: "categories", 
+            localField: "mecanicien.categorieId", 
+            foreignField: "_id", 
+            as: "categorie" 
+         }
+      },
+      {
+         $unwind: "$categorie"
+      },
+      {
+         $lookup: {
+            from: "garages", 
+            localField: "mecanicien.garageId", 
+            foreignField: "_id", 
+            as: "garage" 
+         }
+      },
+      {
+         $unwind: "$garage"
+      },
+      {
+         $lookup: {
+            from: "detail_operations", 
+            localField: "detailOperationId", 
+            foreignField: "_id", 
+            as: "detail_operation" 
+         }
+      },
+      {
+         $unwind: "$detail_operation"
+      },
+      {
+         $lookup: {
+            from: "prestations", 
+            localField: "detail_operation.prestationId", 
+            foreignField: "_id", 
+            as: "prestation" 
+         }
+      },
+      {
+         $unwind: "$prestation"
+      },
+      {
+         $lookup: {
+            from: "operations", 
+            localField: "detail_operation.operationId", 
+            foreignField: "_id", 
+            as: "operation" 
+         }
+      },
+      {
+         $unwind: "$operation"
+      },
+      {
+         $lookup: {
+            from: "rdvs", 
+            localField: "operation.rdvId", 
+            foreignField: "_id", 
+            as: "rdv" 
+         }
+      },
+      {
+         $unwind: "$rdv"
+      },
+      {
+         $lookup: {
+            from: "voitures", 
+            localField: "rdv.voitureId", 
+            foreignField: "_id", 
+            as: "voiture" 
+         }
+      },
+      {
+         $unwind: "$voiture"
+      },
+      {
+         $lookup: {
+            from: "clients", 
+            localField: "voiture.clientId", 
+            foreignField: "_id", 
+            as: "client" 
+         }
+      },
+      {
+         $unwind: "$client"
+      },
+      {
+         $project: {
+            _id: 1,
+            mecanicienId: 1,
+            pseudo_mecanicien: "$mecanicien.pseudo",
+            nom_mecanicien: "$mecanicien.nom",
+            prenom_mecanicien: "$mecanicien.prenom",
+            mail_mecanicien: "$mecanicien.mail",
+
+            categorieId: "$categorie._id",
+            libelle_categorie: "$categorie.libelle_categorie",
+
+            garageId: "$garage._id",
+            localisation_garage: "$garage.localisation",
+
+            detailOperationId: 1,
+            quantite: "$detail_operation.quantite",
+            statut: "$detail_operation.statut",
+
+            prestationId: "$prestation._id",
+            libelle_prestation: "$prestation.libelle_prestation",
+            prix_unitaire_base: "$prestation.prix_unitaire_base",
+            duree: "$prestation.duree",
+
+            voitureId: "$voiture._id",
+            model_voiture: "$voiture.model",
+            marque_voiture: "$voiture.marque",
+            immatriculation_voiture: "$voiture.immatriculation",
+
+            clientId: "$client._id",
+            pseudo_client: "$client.pseudo",
+            nom_client: "$client.nom",
+            prenom_client: "$client.prenom",
+            mail_client: "$client.mail"
+         }
+      }
+   ]
+);
+
+// fin vue TacheView
+
+// debut vue RdvView
+
+db.createView(
+   "RdvView", // Nom de la vue
+   "rdvs", 
+   [
+      {
+         $lookup: {
+            from: "garages", 
+            localField: "garageId", 
+            foreignField: "_id", 
+            as: "garage" 
+         }
+      },
+      {
+         $unwind: "$garage"
+      },
+      {
+         $lookup: {
+            from: "voitures", 
+            localField: "voitureId", 
+            foreignField: "_id", 
+            as: "voiture" 
+         }
+      },
+      {
+         $unwind: "$voiture"
+      },
+      {
+         $lookup: {
+            from: "clients", 
+            localField: "voiture.clientId", 
+            foreignField: "_id", 
+            as: "client" 
+         }
+      },
+      {
+         $unwind: "$client"
+      },
+      {
+         $project: {
+            _id: 1,
+            date_heure: 1,
+            note: 1,
+            statut: 1,
+            garageId: 1,
+            localisation: "$garage.localisation",
+            voitureId: 1,
+            model: "$voiture.model",
+            marque: "$voiture.marque",
+            immatriculation: "$voiture.immatriculation",
+            clientId: "$client._id",
+            pseudo: "$client.pseudo",
+            nom: "$client.nom",
+            prenom: "$client.prenom",
+            mail: "$client.mail"
+         }
+      }
+   ]
+);
+
+// fin vue RdvView
+
+// debut vue DetailOperationView
+
+db.createView(
+   "DetailOperationView", // Nom de la vue
+   "detail_operations", 
+   [
+      {
+         $lookup: {
+            from: "prestations", 
+            localField: "prestationId", 
+            foreignField: "_id", 
+            as: "prestation" 
+         }
+      },
+      {
+         $unwind: "$prestation"
+      },
+      {
+         $lookup: {
+            from: "categories", 
+            localField: "prestation.categorieId", 
+            foreignField: "_id", 
+            as: "categorie" 
+         }
+      },
+      {
+         $unwind: "$categorie"
+      },
+      {
+         $lookup: {
+            from: "operations", 
+            localField: "operationId", 
+            foreignField: "_id", 
+            as: "operation" 
+         }
+      },
+      {
+         $unwind: "$operation"
+      },
+      {
+         $project: {
+            _id: 1,
+            quantite: 1,
+            statut: 1,
+            prestationId: 1,
+            libelle_prestation: "$prestation.libelle_prestation",
+            prix_unitaire_base: "$prestation.prix_unitaire_base",
+            duree: "$prestation.duree",
+            categorieId: "$categorie._id",
+            libelle_categorie: "$categorie.libelle_categorie",
+            operationId: "$operation._id"
+         }
+      }
+   ]
+);
+
+// fin vue

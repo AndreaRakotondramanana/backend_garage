@@ -16,7 +16,10 @@ router.post('/', async (req, res) => {
 // Lire toutes les voitures
 router.get('/', async (req, res) => {
   try {
-    const voitures = await Voiture.find().populate('clientId'); // Récupère les voitures avec les infos du client
+    const { clientId } = req.query;
+
+    const filter = clientId ? { clientId } : {};
+    const voitures = await Voiture.find(filter);
     res.json(voitures);
   } catch (error) {
     res.status(500).json({ message: error.message });

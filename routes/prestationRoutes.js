@@ -26,7 +26,7 @@ router.get('/', async (req, res) => {
 // Lire une prestation par ID
 router.get('/:id', async (req, res) => {
     try {
-        const prestation = await Prestation.findById(req.params.id).populate('categorieId');
+        const prestation = await Prestation.find({ categorieId: req.params.id }).populate('categorieId');
         if (!prestation) return res.status(404).send();
         res.send(prestation);
     } catch (error) {

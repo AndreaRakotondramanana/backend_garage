@@ -23,7 +23,6 @@ const reparationRoutes = require("./routes/reparationRoutes");
 app.use('/api/auth', authRoutes);
 app.use('/api/client', require('./routes/clientRoutes'));
 app.use('/api/garage', require('./routes/garageRoutes'));
-app.use('/api/categorie', require('./routes/categorieRoutes'));
 app.use('/api/prestation', require('./routes/prestationRoutes'));
 app.use('/api/rendez_vous', require('./routes/rendez_vousRoutes'));
 app.use('/api/meca', require('./routes/mecanicienRoutes'));
@@ -32,14 +31,12 @@ app.use("/api/reparations", reparationRoutes);
 
 // Routes Andréa 
 app.use('/utilisateur', require('./routes/utilisateurRoutes'));
-app.use('/client', require('./routes/clientRoutes'));
-app.use('/voiture', require('./routes/voitureRoutes'));
+app.use('/voitures', require('./routes/voitureRoutes'));
 app.use('/garage', require('./routes/garageRoutes'));
 app.use('/categorie', require('./routes/categorieRoutes'));
 app.use('/mecanicien', require('./routes/mecanicienRoutes'));
-app.use('/rdv', require('./routes/rdvRoutes'));
+app.use('/api/rdv', require('./routes/rdvRoutes'));
 app.use('/operation', require('./routes/operationRoutes'));
-app.use('/prestation', require('./routes/prestationRoutes'));
 app.use('/formule', require('./routes/formuleRoutes'));
 app.use('/detail_operation', require('./routes/detail_operationRoutes'));
 app.use('/mecanicienView', require('./routes/mecanicienViewRoutes'));

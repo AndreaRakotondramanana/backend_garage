@@ -16,17 +16,16 @@ router.post('/', async (req, res) => {
 // Lire tous les clients
 router.get('/', async (req, res) => {
     try {
-        const clients = await Client.find().populate('utilisateurId'); // Récupère les clients avec les infos de l'utilisateur
+        const clients = await Client.find().populate('utilisateurId'); 
         res.json(clients);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 });
 
-// Lire un client par son ID
-router.get('/:id', async (req, res) => {
+router.get('/profile/:id', async (req, res) => {
     try {
-        const client = await Client.findById(req.params.id).populate('utilisateurId'); // Récupère le client avec les infos de l'utilisateur
+        const client = await Client.findOne({ utilisateurId: req.params.id }); 
         if (!client) {
             return res.status(404).json({ message: "Client non trouvé" });
         }
@@ -36,10 +35,22 @@ router.get('/:id', async (req, res) => {
     }
 });
 
-// Mettre à jour un client
-router.put('/:id', async (req, res) => {
+router.get('/:id', async (req, res) => {
     try {
-        const client = await Client.findByIdAndUpdate(req.params.id, req.body, { new: true }).populate('utilisateurId'); // Met à jour et renvoie le client avec les infos de l'utilisateur
+        const client = await Client.findOne({ utilisateurId: req.params.id }).select('_id'); 
+        if (!client) {
+            return res.status(404).json({ message: "Client non trouvé" });
+        }
+        res.json({ clientId: client._id });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
+// Mettre à jour un client
+router.put('/modifier/:id', async (req, res) => {
+    try {
+        const client = await Client.findByIdAndUpdate(req.params.id, req.body, { new: true });
         if (!client) {
             return res.status(404).json({ message: "Client non trouvé" });
         }

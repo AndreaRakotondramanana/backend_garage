@@ -2,31 +2,37 @@ const RendezVous = require('../models/Rendez_vous');
 const DetailRendezVous = require('../models/Detail_rendez_vous');
 const Client = require('../models/Client');
 const Rendez_vous = require('../models/Rendez_vous');
+const Operation = require('../models/Operation');
 
 // client prendre rendez_vous
 exports.createRendezVous = async (req, res) => {
     try {
-        const { date_rdv, heure_rdv, clientId, garageId, longitude, latitude, message} = req.body;
+        const { date_heure, voitureId, garageId, note } = req.body;
 
-        // rendez-voous 
+        console.log("Données reçues pour le rendez-vous:", req.body);
+
+        if (isNaN(date_heure)) {
+            return res.status(400).json({ message: 'Date ou heure invalide' });
+        }
+
+        // Création du rendez-vous
         const rendezVous = new RendezVous({
-            date_rdv,
-            heure_rdv,
-            clientId,
-            garageId: garageId || null,
-            longitude: garageId ? null : longitude, 
-            latitude: garageId ? null : latitude,
-            message: message || ''
+            date_heure,
+            voitureId,
+            garageId,
+            note
         });
-        await rendezVous.save();
-        console.log("okkk");
 
-        // les prestations choisies
-            const detail = new DetailRendezVous({
-                rendez_vousId: rendezVous._id,
-                prestationId: "67e24cecb59f73fb6bd95634"
-            });
-            await detail.save();
+        await rendezVous.save();
+
+        // Création de l'opération
+        const detail = new Operation({
+            rdvId: rendezVous._id,
+            date_heure: date_heure,
+            statut: "devis"
+        });
+
+        await detail.save();
 
         return res.status(201).json({ message: 'Rendez-vous créé avec succès', rendezVousId: rendezVous._id });
     } catch (error) {
