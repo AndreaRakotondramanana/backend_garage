@@ -1,15 +1,43 @@
 const express = require('express');
 const router = express.Router();
 const Rdv = require('../models/Rdv');
+const Operation = require('../models/Operation');
 
 // Créer un rendez-vous
 router.post('/', async (req, res) => {
     try {
-        const rdv = new Rdv(req.body);
-        await rdv.save();
-        res.status(201).send(rdv);
+        const { date_heure, voitureId, garageId, note } = req.body;
+
+        console.log("Données reçues pour le rendez-vous:", req.body);
+
+        const dateParsed = new Date(date_heure);
+        if (isNaN(dateParsed.getTime())) {
+            return res.status(400).json({ message: 'Date ou heure invalide' });
+        }
+
+        // Création du rendez-vous
+        const rendezVous = new Rdv({
+            date_heure: dateParsed,
+            voitureId,
+            garageId,
+            note
+        });
+
+        await rendezVous.save();
+
+        // Création de l'opération
+        const detail = new Operation({
+            rdvId: rendezVous._id,
+            date_heure: dateParsed,
+            statut: "devis"
+        });
+
+        await detail.save();
+
+        return res.status(201).json({ message: 'Rendez-vous créé avec succès', rendezVousId: rendezVous._id });
     } catch (error) {
-        res.status(400).send(error);
+        console.error('Erreur lors de la création du rendez-vous:', error);
+        return res.status(500).json({ message: 'Erreur serveur' });
     }
 });
 

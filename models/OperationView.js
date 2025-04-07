@@ -13,6 +13,6 @@ const OperationViewSchema = new mongoose.Schema({
     clientId: mongoose.Schema.Types.ObjectId,
     nom: String,
     prenom: String
-}, { collection: 'OperationView' }); // Spécifiez le nom de la vue ici
+}, { collection: 'OperationView' });
 
 module.exports = mongoose.model('OperationView', OperationViewSchema);

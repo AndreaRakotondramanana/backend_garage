@@ -14,6 +14,11 @@ const Rendez_vousSchema = new mongoose.Schema({
         ref: 'Client',
         required: true
     },
+    voitureId:{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Voiture',
+        required: true
+    },
     garageId:{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Garage',
